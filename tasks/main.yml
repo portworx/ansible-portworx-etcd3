@@ -9,20 +9,40 @@
     name: etcd2
     state: absent
   ignore_errors: yes
+- name: Remove any old existing etcd3
+  package:
+    name: etcd3
+    state: absent
+  ignore_errors: yes
 - name: install the latest version of wget
   package:
     name: wget
     state: latest
-- name: Set up persistent directory
-  shell: |
-       mkdir -p /var/lib/etcd
-       chown -R root:root /var/lib/etcd
-       chmod -R a+rw /var/lib/etcd
+- name: Set up persistent etcd data directory
+  file: 
+    path:  /var/lib/etcd 
+    state: directory
+    owner: root
+    group: root
+    mode:  0775
+- name:  Make tempdir
+  file:
+     path: /tmp/etcd
+     state: directory
+     owner: root
+     group: root
+     mode:  0775
+- name:  Fetch new etcd
+  get_url: 
+     url: https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz 
+     dest: /tmp/
+- name: Unarchive new etcd
+  unarchive: 
+       src: /tmp/etcd-v{{ etcd_version }}-linux-amd64.tar.gz 
+       dest: /tmp
+       remote_src: yes
 - name: Install new etcd
   shell: |
-       wget https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
-       mkdir /tmp/etcd
-       tar xzvf etcd-v{{ etcd_version }}-linux-amd64.tar.gz -C /tmp
        cd /tmp/etcd-v{{ etcd_version }}-linux-amd64
        mv etcd etcdctl /usr/local/bin
        chmod 755 /usr/local/bin/etcd /usr/local/bin/etcdctl
