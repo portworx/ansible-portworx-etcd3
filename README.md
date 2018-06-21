@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/portworx/ansible-portworx-defaults.svg?branch=master)](https://travis-ci.org/portworx/ansible-portworx-defaults)
 # Install etcd3 through Ansible for Portworx
-
 
 ## Sample Playbook
 
